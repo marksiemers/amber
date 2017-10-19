@@ -4,8 +4,7 @@ struct UserSocket < Amber::WebSockets::ClientSocket; end
 
 struct RoomSocket < Amber::WebSockets::ClientSocket; end
 
-
-describe Amber do 
+describe Amber do
   describe ".env" do
     it "should return test" do
       Amber.env.test?.should be_truthy
@@ -55,8 +54,6 @@ describe Amber do
       end
 
       it "retains environment.yml settings that haven't been overwritten" do # NOTE: Any changes to settings here remain for all specs run afterwards.
-        # This is a problem.
-
         Amber::Server.configure do |server|
           server.name = "Hello World App"
           server.port = 8080

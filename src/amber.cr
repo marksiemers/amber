@@ -13,6 +13,7 @@ require "./amber/exceptions/**"
 require "./amber/extensions/**"
 require "./amber/router/**"
 require "./amber/server/**"
+require "./amber/models/**"
 require "./amber/validations/**"
 require "./amber/websockets/**"
 
