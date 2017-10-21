@@ -67,7 +67,7 @@ class <%= @name.capitalize %>Controller < ApplicationController
   def <%= @name %>_params
 	params.validation do
 	  <% @fields.each do |field| %>
-	  <% unless ["created_at", "updated_at"].includes? field.name %>
+	  <% unless %(created_at updated_at).includes? field.name %>
 	  required(:<%= field.name %>) { |p| !p.as(<%= field.cr_type.capitalize %>) }
 	  <% end %>
 	  <% end %>
