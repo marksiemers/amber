@@ -164,7 +164,7 @@ describe HTTP::Server::Context do
 
     context = create_context(request)
 
-    context.params["_json"].should eq ["test", "test2"]
+    context.params["_json"].should eq %w(test test2)
   end
 
   it "parses files from multipart forms" do
