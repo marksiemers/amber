@@ -204,8 +204,7 @@ end
 
 def params_builder(body = "")
   params = {} of String | Symbol => Amber::Router::ParamsType
-  HTTP::Params.parse(body).each do |key, value|
+  HTTP::Params.parse(body).each_with_object(params) do |(key, value), params|
     params[key] = value.as(Amber::Router::ParamsType)
   end
-  params
 end
