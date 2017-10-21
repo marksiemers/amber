@@ -1,7 +1,6 @@
 require "granite_orm/adapter/<%= @database %>"
 
 class <%= @name.capitalize %> < Granite::ORM::Base
-  include Amber::Models::Granite
   adapter <%= @database %>
 
 <% @fields.select{|f| f.reference? }.each do |field| -%>
