@@ -91,8 +91,8 @@ module Amber::Validators
         validator = Validators::Params.new(http_params)
 
         result = validator.validation do
-          required(:name) { |v| !v.as(String).empty? }
-          required("last_name") { |v| !v.as(String).empty? }
+          required(:name) { |v| !v.to_s.empty? }
+          required("last_name") { |v| !v.to_s.empty? }
         end
 
         validator.valid?.should be_true
@@ -106,8 +106,8 @@ module Amber::Validators
             validator = Validators::Params.new(http_params)
 
             result = validator.validation do
-              optional(:name) { |v| v.as(String).empty? }
-              required("last_name") { |v| v.as(String).empty? }
+              optional(:name) { |v| v.to_s.empty? }
+              required("last_name") { |v| v.to_s.empty? }
             end
 
             validator.valid?.should be_true
@@ -121,11 +121,29 @@ module Amber::Validators
             validator = Validators::Params.new(http_params)
 
             result = validator.validation do
-              optional(:name) { |v| !v.as(String).empty? }
+              optional(:name) { |v| !v.to_s.empty? }
             end
 
             validator.valid?.should be_false
             validator.errors.size.should eq 1
+          end
+        end
+
+        context "casting" do
+          it "returns false for the given block" do
+            params = params_builder("name=john&number=1&price=3.45&list=[1,2,3]")
+            validator = Validators::Params.new(params)
+            validator.validation do
+              required(:name) { |f| !f.to_s.empty? }
+              required(:number) { |f| JSON.parse(f.as(String)).as_i > 0 }
+              required(:price) { |f| JSON.parse(f.as(String)).as_f == 3.45 }
+              required(:list) do |f|
+                list = JSON.parse(f.as(String)).as_a
+                (list == [1, 2, 3] && !list.includes? 6)
+              end
+            end
+
+            validator.valid?.should be_truthy
           end
         end
       end
@@ -137,8 +155,8 @@ module Amber::Validators
         validator = Validators::Params.new(http_params)
 
         validator.validation do
-          required("name") { |v| v.as(String).empty? }
-          required("last_name") { |v| !v.as(String).empty? }
+          required("name") { |v| v.to_s.empty? }
+          required("last_name") { |v| !v.to_s.empty? }
         end
 
         validator.valid?.should be_false
@@ -150,7 +168,7 @@ module Amber::Validators
         result = {"nonexisting" => {nil, "Param [nonexisting] does not exist."}}
 
         validator.validation do
-          required("nonexisting") { |v| !v.as(String).empty? }
+          required("nonexisting") { |v| !v.to_s.empty? }
         end
 
         expect_raises Exceptions::Validator::InvalidParam do
@@ -163,8 +181,8 @@ module Amber::Validators
         validator = Validators::Params.new(http_params)
 
         validator.validation do
-          required("name") { |v| !v.as(String).empty? }
-          required("last_name") { |v| !v.as(String).empty? }
+          required("name") { |v| !v.to_s.empty? }
+          required("last_name") { |v| !v.to_s.empty? }
         end
 
         validator.valid?.should be_true
@@ -177,8 +195,8 @@ module Amber::Validators
         validator = Validators::Params.new(http_params)
 
         validator.validation do
-          required("name") { |v| !v.as(String).empty? }
-          required("last_name") { |v| !v.as(String).empty? }
+          required("name") { |v| !v.to_s.empty? }
+          required("last_name") { |v| !v.to_s.empty? }
         end
 
         expect_raises Exceptions::Validator::ValidationFailed do
@@ -192,8 +210,8 @@ module Amber::Validators
         result : Hash(String, String) = {"name" => "elias", "last_name" => "perez"}
 
         validator.validation do
-          required("name") { |v| !v.as(String).empty? }
-          required("last_name") { |v| !v.as(String).empty? }
+          required("name") { |v| !v.to_s.empty? }
+          required("last_name") { |v| !v.to_s.empty? }
         end
 
         validator.validate!.should eq result
@@ -204,7 +222,8 @@ end
 
 def params_builder(body = "")
   params = {} of String | Symbol => Amber::Router::ParamsType
-  HTTP::Params.parse(body).each_with_object(params) do |(key, value), params|
-    params[key] = value.as(Amber::Router::ParamsType)
+  body.tr("?", "").split("&").each_with_object(params) do |item, params|
+    key, value = item.split("=")
+    params[key] = value
   end
 end
