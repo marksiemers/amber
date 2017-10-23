@@ -135,8 +135,8 @@ module Amber::Validators
             validator = Validators::Params.new(params)
             validator.validation do
               required(:name) { |f| !f.to_s.empty? }
-              required(:number) { |f| JSON.parse(f.as(String)).as_i > 0 }
-              required(:price) { |f| JSON.parse(f.as(String)).as_f == 3.45 }
+              required(:number) { |f| f.as(String).to_i > 0 }
+              required(:price) { |f| f.as(String).to_f == 3.45 }
               required(:list) do |f|
                 list = JSON.parse(f.as(String)).as_a
                 (list == [1, 2, 3] && !list.includes? 6)

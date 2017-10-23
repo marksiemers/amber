@@ -1,7 +1,7 @@
 require "json"
 
 module Amber::Router
-  alias ParamsType = Float32 | Int32 | Time | Bytes | Nil | String | Int64 | Float64 | Bool | Hash(String, JSON::Type) | Array(JSON::Type)
+  alias ParamsType = String | JSON::Type
   alias ParamsHash = Hash(String | Symbol, Amber::Router::ParamsType)
 
   # The Parameters module will parse parameters from a URL, a form post or a JSON
@@ -91,7 +91,7 @@ module Amber::Router
           case json = JSON.parse(body).raw
           when Hash
             json.each do |key, value|
-              params[key] = value.as(Amber::Router::ParamsType)
+              params[key.as(String)] = value
             end
           when Array
             params["_json"] = json

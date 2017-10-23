@@ -68,19 +68,7 @@ class <%= @name.capitalize %>Controller < ApplicationController
     params.validation do
       <%- @fields.each do |field| -%>
       <%- unless %(created_at updated_at).includes? field.name -%>
-      <%- if %w(Int32 Int64).includes? field.cr_type -%>
-      required(:<%= field.name %>) { |p| !JSON.parse(p.as(String)).as_i.nil? }
-      <%- elsif %w(Bool).includes? field.cr_type -%>
-      required(:<%= field.name %>) { |p| JSON.parse(p.as(String)).as_bool }
-      <%- elsif %w(Float32 Float64).includes? field.cr_type -%>
-      required(:<%= field.name %>) { |p| !JSON.parse(p.as(String)).as_f.nil? }
-      <%- elsif "Array" == field.cr_type -%>
-      required(:<%= field.name %>) { |p| JSON.parse(p.as(String)).as_a.empty? }
-      <%- elsif "Hash" == field.cr_type -%>
-      required(:<%= field.name %>) { |p| JSON.parse(p.as(String)).as_h.empty? }
-      <%- elsif "String" -%>
       required(:<%= field.name %>) { |p| p.to_s.empty? }
-      <%- end -%>
       <%- end -%>
       <%- end -%>
     end
